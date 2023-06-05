@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  KeySSH:
+    Description: 'IP address for SSH access'
+    Type: String
+  MyIP:
+    Description: 'IP address for SSH access'
+    Type: String
+  UserData:
+    Description: 'Base64 encoded user data'
+    Type: String
+    Default: |
+      #!/bin/bash
+      sudo apt update -y
+      sudo apt install -y python3
+      sudo apt install -y python3-pip
+      sudo apt install -y git &
+Resources:
+  EC2ROLE:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - Ref: EC2ROLE
+
+  EC2Instance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-042e8287309f5df03
+      InstanceType: t2.micro
+      KeyName: !Ref KeySSH
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      IamInstanceProfile: !Ref InstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          ${UserData}
+          #!/bin/bash
+          echo "export STACK_NAME=${AWS::StackName}" >> /etc/environment
+          echo "export SECURITY_GROUP_ID=${EC2SecurityGroup}" >> /etc/environment
+
+  EC2Instance2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-042e8287309f5df03
+      InstanceType: t2.micro
+      KeyName: !Ref KeySSH
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      IamInstanceProfile: !Ref InstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          ${UserData}
+          #!/bin/bash
+          echo "export STACK_NAME=${AWS::StackName}" >> /etc/environment
+          echo "export SECURITY_GROUP_ID=${EC2SecurityGroup}" >> /etc/environment
+
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH and HTTP
+      SecurityGroupIngress:
+        - CidrIp: !Ref MyIP
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        - CidrIp: !Ref MyIP
+          IpProtocol: tcp
+          FromPort: 5000
+          ToPort: 5000
+Outputs:
+  Instance1PublicIP:
+    Value: !GetAtt EC2Instance1.PublicIp
+  Instance2PublicIP:
+    Value: !GetAtt EC2Instance2.PublicIp
+  InstanceID1:
+    Value: !Ref EC2Instance1
+  InstanceID2:
+    Value: !Ref EC2Instance2

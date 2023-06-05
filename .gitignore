@@ -2,6 +2,7 @@
 *.pyc
 *.pyo
 *.pyd
+*.pem
 
 # Cache files
 __pycache__/
