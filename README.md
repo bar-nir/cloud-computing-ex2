@@ -1,4 +1,4 @@
-This guide will help you set up the project and run it on an EC2 instance.
+This guide will help you set up the project and deploy it to AWS
 
 1. clone the project and install requirements
 

@@ -6,7 +6,7 @@ INSTANCE_USER="ubuntu"
 
 ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i "$KEY_PATH" "$INSTANCE_USER"@"$INSTANCE_IP" << EOF
   echo "export OTHER_IP=$OTHER_IP" | sudo tee -a /etc/environment
-  echo "export MY_IP=${INSTANCE_IP}" | sudo tee -a /etc/environment
+  echo "export MY_IP=$INSTANCE_IP" | sudo tee -a /etc/environment
   source /etc/environment
   git clone https://github.com/bar-nir/cloud-computing-ex2.git
   cd cloud-computing-ex2/Mangers
