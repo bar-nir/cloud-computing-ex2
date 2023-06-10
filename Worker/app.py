@@ -1,9 +1,10 @@
 import time
 import hashlib
 import requests
-import json
 import os
 import subprocess
+
+SLEEP_TIME = 1
 
 
 def work(data, iterations):
@@ -24,7 +25,7 @@ def process_job():
             print(f"shutting down server")
             os.chmod("./terminate_ec2.sh", 0o777)
             subprocess.run(['bash', './terminate_ec2.sh'])
-        time.sleep(1)
+        time.sleep(SLEEP_TIME)
         request_jobs_attempts += 1
         try:
             manger1_queue_length = requests.get(
