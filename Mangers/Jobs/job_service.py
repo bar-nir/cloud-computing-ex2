@@ -50,7 +50,6 @@ class JobService():
                 if self.max_workers > self.worksers \
                         and datetime.now() - datetime.fromisoformat(current_job["date"]) > timedelta(seconds=self.scale_worker_time_deltalf.sleep_time):
                     try:
-                        self.is_deploy_in_progress = True
                         self.deploy_new_worker()
                     except Exception as e:
                         print(f"error in deploying new worker {e}")
@@ -128,11 +127,10 @@ class JobService():
             self.worksers += 1
         except Exception as e:
             print(f"Error: {e}")
-            
+
     def set_time_deltas(self, time_delta):
         try:
             self.scale_worker_time_delta = int(time_delta['scale_delta'])
             self.worker_delta = int(time_delta['worker_delta'])
         except Exception as e:
             print(f"Error: {e}")
-        
