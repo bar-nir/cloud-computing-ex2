@@ -4,7 +4,7 @@ import requests
 import os
 import subprocess
 
-SLEEP_TIME = 1
+
 
 
 def work(data, iterations):
@@ -15,6 +15,7 @@ def work(data, iterations):
 
 
 def process_job():
+    SLEEP_TIME = int(os.environ.get("WORKER_DELTA","6"))
     EC2_IP1 = os.environ.get("EC2IP1")
     EC2_IP2 = os.environ.get("EC2IP2")
     print(f"EC2_IP1: {EC2_IP1}, EC2_IP2:{EC2_IP2}")
