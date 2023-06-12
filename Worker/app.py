@@ -5,8 +5,6 @@ import os
 import subprocess
 
 
-
-
 def work(data, iterations):
     output = hashlib.sha512(data.encode()).digest()
     for i in range(iterations - 1):
@@ -15,14 +13,14 @@ def work(data, iterations):
 
 
 def process_job():
-    SLEEP_TIME = int(os.environ.get("WORKER_DELTA","6"))
+    SLEEP_TIME = int(os.environ.get("WORKER_DELTA", "6"))
     EC2_IP1 = os.environ.get("EC2IP1")
     EC2_IP2 = os.environ.get("EC2IP2")
     print(f"EC2_IP1: {EC2_IP1}, EC2_IP2:{EC2_IP2}")
     request_jobs_attempts = 0
     while True:
         print(f"in attempt: {request_jobs_attempts}")
-        if request_jobs_attempts > 10:
+        if request_jobs_attempts > 4:
             print(f"shutting down server")
             os.chmod("./terminate_ec2.sh", 0o777)
             subprocess.run(['bash', './terminate_ec2.sh'])

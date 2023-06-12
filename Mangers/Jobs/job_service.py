@@ -20,7 +20,7 @@ class JobService():
         self.completed_jobs = queue.Queue()
         self.treshhold_to_pass_message = 3
         self.scale_worker_time_delta = 3
-        self.worker_delta = 6
+        self.worker_delta = 15
         threading.Thread(target=self.scale_workers).start()
 
     def add_job(self, iterations: int, data: str) -> str:
@@ -121,7 +121,7 @@ class JobService():
             print("EC2 created:", response)
             instance_id = response['Instances'][0]['InstanceId']
             print(f'Launching instance {instance_id}...')
-            waiter = ec2.get_waiter('instance_running')
+            waiter = ec2.get_waiter('instance_status_ok')
             waiter.wait(InstanceIds=[instance_id])
             print(f'Instance {instance_id} is running.')
             self.worksers += 1
