@@ -48,7 +48,7 @@ class JobService():
             if not self.incompleted_jobs.empty():
                 current_job = self.incompleted_jobs.queue[0]
                 if self.max_workers > self.worksers \
-                        and datetime.now() - datetime.fromisoformat(current_job["date"]) > timedelta(seconds=self.scale_worker_time_deltalf.sleep_time):
+                        and datetime.now() - datetime.fromisoformat(current_job["date"]) > timedelta(seconds=self.scale_worker_time_delta):
                     try:
                         self.deploy_new_worker()
                     except Exception as e:
