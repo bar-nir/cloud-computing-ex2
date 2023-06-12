@@ -1,13 +1,11 @@
 import json
 import threading
+import time
 import uuid
 import requests
 from datetime import datetime, timedelta
 import queue
-from apscheduler.schedulers.background import BackgroundScheduler
 import os
-import logging
-from Mangers.workerDeploy import deploy_new_worker
 import boto3
 
 
@@ -21,10 +19,9 @@ class JobService():
         self.other_manager_ip = os.environ.get('OTHER_IP')
         self.is_deploy_in_progress = False
         self.completed_jobs = queue.Queue()
-        scheduler = BackgroundScheduler(daemon=True)
-        scheduler.add_job(self.scale_workers, 'interval', seconds=30)
         self.treshhold_to_pass_message = 3
-        scheduler.start()
+        self.sleep_time = 10
+        threading.Thread(target=self.scale_workers).start()
 
     def add_job(self, iterations: int, data: str) -> str:
         print(data, iterations)
@@ -46,15 +43,17 @@ class JobService():
         return id
 
     def scale_workers(self):
-        if self.is_deploy_in_progress == False and not self.incompleted_jobs.empty():
-            current_job = self.incompleted_jobs.queue[0]
-            if self.max_workers > self.worksers \
-                    and datetime.now() - datetime.fromisoformat(current_job["date"]) > timedelta(seconds=10):
-                try:
-                    threading.Thread(target=self.deploy_new_worker).start()
-                    self.worksers += 1
-                except Exception as e:
-                    logging.error(e)
+        while True:
+            time.sleep(self.sleep_time)
+            if self.is_deploy_in_progress == False and not self.incompleted_jobs.empty():
+                current_job = self.incompleted_jobs.queue[0]
+                if self.max_workers > self.worksers \
+                        and datetime.now() - datetime.fromisoformat(current_job["date"]) > timedelta(seconds=10):
+                    try:
+                        self.is_deploy_in_progress = True
+                        self.deploy_new_worker()
+                    except Exception as e:
+                        print(f"error in deploying new worker {e}")
 
     def get_next_job(self):
         if not self.incompleted_jobs.empty():
@@ -126,6 +125,7 @@ class JobService():
             waiter.wait(InstanceIds=[instance_id])
             print(f'Instance {instance_id} is running.')
             self.is_deploy_in_progress = False
+            self.worksers += 1
         except Exception as e:
             self.is_deploy_in_progress = False
             print(f"Error: {e}")
