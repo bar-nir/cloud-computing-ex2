@@ -17,10 +17,10 @@ class JobService():
         self.max_workers = 3
         self.MY_IP = os.environ.get('MY_IP')
         self.other_manager_ip = os.environ.get('OTHER_IP')
-        self.is_deploy_in_progress = False
         self.completed_jobs = queue.Queue()
         self.treshhold_to_pass_message = 3
-        self.sleep_time = 10
+        self.scale_worker_time_delta = 3
+        self.worker_delta = 6
         threading.Thread(target=self.scale_workers).start()
 
     def add_job(self, iterations: int, data: str) -> str:
@@ -44,11 +44,11 @@ class JobService():
 
     def scale_workers(self):
         while True:
-            time.sleep(self.sleep_time)
-            if self.is_deploy_in_progress == False and not self.incompleted_jobs.empty():
+            time.sleep(self.scale_worker_time_delta)
+            if not self.incompleted_jobs.empty():
                 current_job = self.incompleted_jobs.queue[0]
                 if self.max_workers > self.worksers \
-                        and datetime.now() - datetime.fromisoformat(current_job["date"]) > timedelta(seconds=10):
+                        and datetime.now() - datetime.fromisoformat(current_job["date"]) > timedelta(seconds=self.scale_worker_time_deltalf.sleep_time):
                     try:
                         self.is_deploy_in_progress = True
                         self.deploy_new_worker()
@@ -110,6 +110,7 @@ class JobService():
             sudo apt install -y git
             echo "export EC2IP1={EC2_IP1}" | sudo tee -a /etc/environment
             echo "export EC2IP2={EC2_IP2}" | sudo tee -a /etc/environment
+            echo "export WORKER_DELTA={self.worker_delta}" | sudo tee -a /etc/environment
             source /etc/environment
             git clone https://github.com/bar-nir/cloud-computing-ex2.git
             cd cloud-computing-ex2/Worker
@@ -121,11 +122,17 @@ class JobService():
             print("EC2 created:", response)
             instance_id = response['Instances'][0]['InstanceId']
             print(f'Launching instance {instance_id}...')
-            waiter = ec2.get_waiter('instance_status_ok')
+            waiter = ec2.get_waiter('instance_running')
             waiter.wait(InstanceIds=[instance_id])
             print(f'Instance {instance_id} is running.')
-            self.is_deploy_in_progress = False
             self.worksers += 1
         except Exception as e:
-            self.is_deploy_in_progress = False
             print(f"Error: {e}")
+            
+    def set_time_deltas(self, time_delta):
+        try:
+            self.scale_worker_time_delta = int(time_delta['scale_delta'])
+            self.worker_delta = int(time_delta['worker_delta'])
+        except Exception as e:
+            print(f"Error: {e}")
+        
