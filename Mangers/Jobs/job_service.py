@@ -102,6 +102,7 @@ class JobService():
                 ImageId="ami-042e8287309f5df03",
                 InstanceType="t2.micro",
                 SecurityGroups=[SECURITY_GROUP],
+                InstanceInitiatedShutdownBehavior='terminate',
                 MinCount=1,
                 MaxCount=1,
                 UserData=f'''#!/bin/bash
