@@ -14,9 +14,15 @@ cd cloud-computing-ex2
 pip3 install -r requirements.txt
 ```
 
-2. Deploy
+2. Deploy for mac
 
 ```bash
+sudo python3 deploy.py
+```
+
+2. Deploy for windows , make sure to run as a admin!
+
+```
 python3 deploy.py
 ```
 
