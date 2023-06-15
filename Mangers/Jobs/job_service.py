@@ -20,7 +20,7 @@ class JobService():
         self.completed_jobs = queue.Queue()
         self.treshhold_to_pass_message = 3
         self.scale_worker_time_delta = 3
-        self.worker_delta = 15
+        self.worker_delta = 5
         threading.Thread(target=self.scale_workers).start()
 
     def add_job(self, iterations: int, data: str) -> str:
