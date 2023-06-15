@@ -1,7 +1,7 @@
 import random
-import subprocess
 import os
 import boto3
+import paramiko
 
 
 def create_random_string():
@@ -78,18 +78,44 @@ def wait_for_instances(ec2, instances_ids):
         waiter.wait(InstanceIds=[instance_id])
 
 
-def run_flask_server(bash_script, public_ip_instance_1, public_ip_instance_2, key_name):
-    os.chmod(bash_script, 0o777)
+def run_flask_server(public_ip_instance_1, public_ip_instance_2, key_name):
+    key = paramiko.RSAKey(filename=f"{key_name}.pem")
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    command = ['bash', bash_script, public_ip_instance_1,
-               public_ip_instance_2, f"{key_name}.pem"]
+    bash_commands = '''
+        echo "export OTHER_IP={other_ip}" | sudo tee -a /etc/environment
+        echo "export MY_IP={instance_ip}" | sudo tee -a /etc/environment
+        source /etc/environment
+        git clone https://github.com/bar-nir/cloud-computing-ex2.git
+        cd cloud-computing-ex2/Mangers
+        sudo chmod 777 app.py
+        sudo pip3 install -r requirements.txt
+        sudo nohup python3 app.py > flask.log 2>&1 &
+    '''
 
-    subprocess.run(command)
+    print(f"Starting ssh to IP: {public_ip_instance_1}")
+    ssh.connect(public_ip_instance_1, username='ubuntu', pkey=key)
+    stdin, stdout, stderr = ssh.exec_command(bash_commands.format(
+        other_ip=public_ip_instance_2, instance_ip=public_ip_instance_1))
 
-    command = ['bash', bash_script, public_ip_instance_2,
-               public_ip_instance_1, f"{key_name}.pem"]
+    output = stdout.read().decode()
+    print(output)
+    ssh.close()
 
-    subprocess.run(command)
+    print(f"Server with IP: {public_ip_instance_1} is ready to use")
+
+    print(f"Starting ssh to IP: {public_ip_instance_2}")
+    ssh.connect(public_ip_instance_2, username='ubuntu', pkey=key)
+    stdin, stdout, stderr = ssh.exec_command(bash_commands.format(
+        other_ip=public_ip_instance_1, instance_ip=public_ip_instance_2))
+    output = stdout.read().decode()
+    print(output)
+    ssh.close()
+
+    print(f"Server with IP: {public_ip_instance_2} is ready to use")
+
+    print("SSH Finished")
 
 
 def main():
@@ -128,7 +154,7 @@ def main():
     print('All instances are running.')
 
     print("Running flask server on instances")
-    run_flask_server("./set_env.sh", public_ip_instance_1,
+    run_flask_server(public_ip_instance_1,
                      public_ip_instance_2, key_name)
 
     print(
