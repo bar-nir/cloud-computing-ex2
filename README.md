@@ -24,7 +24,8 @@ sudo python3 deploy.py
 
 ```bash
 python3 deploy.py
-``
+```
+
 ## document detailing failure modes and how to deal with them if this was a real-world project.
 
 Can be found under the main repo with file name `failure modes.pdf`
@@ -199,6 +200,8 @@ curl --location --request POST '3.235.135.117:5000/pullCompleted?top=10&from=man
 ```
 
 curl --location --request POST '3.235.135.117:5000/worker-has-started'
+
+```
 
 ```
 
