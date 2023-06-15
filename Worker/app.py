@@ -22,7 +22,6 @@ def process_job():
         print(f"in attempt: {request_jobs_attempts}")
         if request_jobs_attempts > 4:
             print(f"shutting down server")
-            os.chmod("./terminate_ec2.sh", 0o777)
             subprocess.run(['bash', './terminate_ec2.sh'])
         time.sleep(SLEEP_TIME)
         request_jobs_attempts += 1

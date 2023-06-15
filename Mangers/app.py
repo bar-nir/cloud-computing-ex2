@@ -1,7 +1,6 @@
 #!flask/bin/python
 from flask import Flask
 from Jobs.job_controller import job_controller
-from apscheduler.schedulers.background import BackgroundScheduler
 
 
 app = Flask(__name__)

@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from Jobs.job_service import JobService
-import os
 import logging
 
 job_controller = Blueprint('job_controller', __name__)

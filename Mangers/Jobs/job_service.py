@@ -114,6 +114,7 @@ class JobService():
             git clone https://github.com/bar-nir/cloud-computing-ex2.git
             cd cloud-computing-ex2/Worker
             sudo chmod 777 app.py
+            sudo chmod 777 terminate_ec2.sh
             sudo pip3 install -r requirements.txt
             sudo python3 app.py
             ''',
