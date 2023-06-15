@@ -1,24 +1,24 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   KeySSH:
-    Description: "IP address for SSH access"
+    Description: 'IP address for SSH access'
     Type: String
   MyIP:
-    Description: "IP address for SSH access"
+    Description: 'IP address for SSH access'
     Type: String
   UserData:
-    Description: "Base64 encoded user data"
+    Description: 'Base64 encoded user data'
     Type: String
     Default: |
       #!/bin/bash
-      sudo apt update -y &
+      sudo apt update -y 
       sudo apt install -y git &
 Resources:
   EC2ROLE:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
