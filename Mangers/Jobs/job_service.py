@@ -29,18 +29,19 @@ class JobService():
         id = str(uuid.uuid4())
         current_job = ({"id": id, "iterations": iterations,
                        'date': datetime.now().isoformat(), "data": data})
-        other_manager_queue_length = requests.get(
-            f'http://{self.other_manager_ip}:5000/length', timeout=5).json()
+        try:
+            other_manager_queue_length = requests.get(
+                f'http://{self.other_manager_ip}:5000/length', timeout=5).json()
 
-        if (self.incompleted_jobs.qsize() - self.treshhold_to_pass_message > other_manager_queue_length):
-            try:
+            if (self.incompleted_jobs.qsize() - self.treshhold_to_pass_message > other_manager_queue_length):
+
                 requests.put(f'http://{self.other_manager_ip}:5000/manager/add',
                              json=current_job, timeout=5)
-            except Exception as e:
-                print(f"error: {e}")
+            else:
                 self.incompleted_jobs.put(current_job)
 
-        else:
+        except Exception as e:
+            print(f"error: {e}")
             self.incompleted_jobs.put(current_job)
 
         return id
@@ -82,10 +83,12 @@ class JobService():
         print(from_request, top)
         if top and from_request != 'manager':
             print(f"getting jobs from other manager")
-            other_mangaer_jobs = requests.post(
-                f'http://{self.other_manager_ip}:5000/pullCompleted?top={top}&from=manager', timeout=5).json()
-            jobs += other_mangaer_jobs
-
+            try:
+                other_mangaer_jobs = requests.post(
+                    f'http://{self.other_manager_ip}:5000/pullCompleted?top={top}&from=manager', timeout=5).json()
+                jobs += other_mangaer_jobs
+            except Exception as e:
+                return jobs
         print(f"total jobs {jobs} ")
         return jobs
 
