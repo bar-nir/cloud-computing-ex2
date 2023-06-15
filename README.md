@@ -14,12 +14,17 @@ cd cloud-computing-ex2
 pip3 install -r requirements.txt
 ```
 
-2. Deploy for mac
+2. Deploy on mac
 
 ```bash
 sudo python3 deploy.py
 ```
 
+3. Deploy on Windows. Run as admin!
+
+```bash
+python3 deploy.py
+``
 ## document detailing failure modes and how to deal with them if this was a real-world project.
 
 Can be found under the main repo with file name `failure modes.pdf`
@@ -36,9 +41,11 @@ This API provides an interface for managing jobs and workers in a system.
 * example:
 
 ```
+
 curl --location --request PUT '3.235.135.117:5000/enqueue?iterations=10' \
 --header 'Content-Type: application/json' \
 --data-raw '"asdasdasdasdasdasdasdakljfaljfadjfdahjfadhjk"'
+
 ```
 
 ## Get completed jobs
@@ -48,7 +55,9 @@ curl --location --request PUT '3.235.135.117:5000/enqueue?iterations=10' \
 - **example**:
 
 ```
+
 curl --location --request POST '3.235.135.117:5000/pullCompleted?top=10'
+
 ```
 
 # Set Scale Worker Time Delta
@@ -69,12 +78,14 @@ curl --location --request POST '3.235.135.117:5000/pullCompleted?top=10'
 - **example**:
 
 ```
+
 curl --location --request POST '3.235.135.117:5000/scale-worker-time-delta' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "scale_delta": 1,
-    "worker_delta": 5
+"scale_delta": 1,
+"worker_delta": 5
 }'
+
 ```
 
 ## Get Incomplete Jobs Length
@@ -84,7 +95,9 @@ curl --location --request POST '3.235.135.117:5000/scale-worker-time-delta' \
 - **example**:
 
 ```
+
 curl --location --request GET '3.235.135.117:5000/length'
+
 ```
 
 # Routes that the system uses.
@@ -98,7 +111,9 @@ curl --location --request GET '3.235.135.117:5000/length'
 - **example**:
 
 ```
+
 curl --location --request GET '3.235.135.117:5000/length'
+
 ```
 
 ## Delete Worker (remove current number of workers)
@@ -110,7 +125,9 @@ curl --location --request GET '3.235.135.117:5000/length'
 - **example**:
 
 ```
+
 curl -X DELETE 3.235.135.117:5000/worker
+
 ```
 
 ## Add completed job to manager
@@ -122,7 +139,9 @@ curl -X DELETE 3.235.135.117:5000/worker
 - **example**:
 
 ```
+
 curl -X POST -H "Content-Type: application/json" -d '{"id": "60", "date": "10","iterations": "10","data": "hashed string"}' "3.235.135.117:5000/worker/completed"
+
 ```
 
 ## Get job from manager to worker
@@ -134,7 +153,9 @@ curl -X POST -H "Content-Type: application/json" -d '{"id": "60", "date": "10","
 - **example**:
 
 ```
+
 curl 3.235.135.117:5000/worker/job
+
 ```
 
 ## Add incompleted job to manager by other manager
@@ -146,9 +167,11 @@ curl 3.235.135.117:5000/worker/job
 - **example**:
 
 ```
+
 curl --location --request PUT '3.235.135.117:5000/manager/add' \
 --header 'Content-Type: application/json' \
 --data-raw '{"id": "60", "date": "10","iterations": "10","data": "string to hash"}'
+
 ```
 
 ## Get completed jobs
@@ -160,7 +183,9 @@ curl --location --request PUT '3.235.135.117:5000/manager/add' \
 - **example**:
 
 ```
+
 curl --location --request POST '3.235.135.117:5000/pullCompleted?top=10&from=manager'
+
 ```
 
 ## Worker notify the manager that he is running
@@ -172,5 +197,9 @@ curl --location --request POST '3.235.135.117:5000/pullCompleted?top=10&from=man
 - **example**:
 
 ```
+
 curl --location --request POST '3.235.135.117:5000/worker-has-started'
+
+```
+
 ```
