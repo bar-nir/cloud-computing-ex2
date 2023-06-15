@@ -20,12 +20,6 @@ pip3 install -r requirements.txt
 sudo python3 deploy.py
 ```
 
-2. Deploy for windows , make sure to run as a admin!
-
-```
-python3 deploy.py
-```
-
 ## document detailing failure modes and how to deal with them if this was a real-world project.
 
 Can be found under the main repo with file name `failure modes.pdf`
