@@ -84,6 +84,9 @@ def run_flask_server(public_ip_instance_1, public_ip_instance_2, key_name):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     bash_commands = '''
+        sudo apt install -y python3
+        sudo apt install -y python3-pip
+        sudo apt install -y git &
         echo "export OTHER_IP={other_ip}" | sudo tee -a /etc/environment
         echo "export MY_IP={instance_ip}" | sudo tee -a /etc/environment
         source /etc/environment

@@ -12,9 +12,6 @@ Parameters:
     Default: |
       #!/bin/bash
       sudo apt update -y
-      sudo apt install -y python3
-      sudo apt install -y python3-pip
-      sudo apt install -y git &
 Resources:
   EC2ROLE:
     Type: AWS::IAM::Role
