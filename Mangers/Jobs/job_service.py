@@ -53,11 +53,11 @@ class JobService():
                 if self.max_workers > self.worksers \
                         and datetime.now() - datetime.fromisoformat(current_job["date"]) > timedelta(seconds=self.scale_worker_time_delta):
                     try:
-                        self.deploy_in_progress == True
+                        self.deploy_in_progress = True
                         self.worksers += 1
                         self.deploy_new_worker()
                     except Exception as e:
-                        self.deploy_in_progress == False
+                        self.deploy_in_progress = False
                         self.worksers = self.worksers - 1
                         print(f"error in deploying new worker {e}")
 
