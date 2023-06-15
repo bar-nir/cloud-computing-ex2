@@ -129,6 +129,9 @@ class JobService():
         print("EC2 created:", response)
         instance_id = response['Instances'][0]['InstanceId']
         print(f'Launching instance {instance_id}...')
+        waiter = ec2.get_waiter('instance_running')
+        waiter.wait(InstanceIds=[instance_id])
+        print(f'Instance {instance_id} is running.')
 
     def set_time_deltas(self, time_delta):
         try:
