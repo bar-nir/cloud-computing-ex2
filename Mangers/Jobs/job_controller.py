@@ -79,11 +79,21 @@ def add_completed_job():
     except Exception as e:
         return jsonify({'message': f'Error: {e}'}), 500
 
+
 @job_controller.route('/scale-worker-time-delta', methods=['POST'])
 def set_scale_worker_time_delta():
     try:
         time_delta = request.get_json()
         job_service.set_time_deltas(time_delta)
         return jsonify("Seted"), 200
+    except Exception as e:
+        return jsonify({'message': f'Error: {e}'}), 500
+
+
+@job_controller.route('/worker-has-started', methods=['POST'])
+def worker_has_started():
+    try:
+        job_service.deploy_in_progress_to_false()
+        return jsonify("OK"), 200
     except Exception as e:
         return jsonify({'message': f'Error: {e}'}), 500

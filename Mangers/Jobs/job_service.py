@@ -21,6 +21,7 @@ class JobService():
         self.treshhold_to_pass_message = 3
         self.scale_worker_time_delta = 3
         self.worker_delta = 5
+        self.deploy_in_progress = False
         threading.Thread(target=self.scale_workers).start()
 
     def add_job(self, iterations: int, data: str) -> str:
@@ -47,13 +48,17 @@ class JobService():
     def scale_workers(self):
         while True:
             time.sleep(self.scale_worker_time_delta)
-            if not self.incompleted_jobs.empty():
+            if not self.incompleted_jobs.empty() and self.deploy_in_progress == False:
                 current_job = self.incompleted_jobs.queue[0]
                 if self.max_workers > self.worksers \
                         and datetime.now() - datetime.fromisoformat(current_job["date"]) > timedelta(seconds=self.scale_worker_time_delta):
                     try:
+                        self.deploy_in_progress == True
+                        self.worksers += 1
                         self.deploy_new_worker()
                     except Exception as e:
+                        self.deploy_in_progress == False
+                        self.worksers = self.worksers - 1
                         print(f"error in deploying new worker {e}")
 
     def get_next_job(self):
@@ -93,44 +98,37 @@ class JobService():
         EC2_IP1 = os.environ.get("MY_IP")
         EC2_IP2 = os.environ.get("OTHER_IP")
         SECURITY_GROUP = os.environ.get("SECURITY_GROUP_ID")
-        try:
-            ec2 = boto3.client('ec2', region_name="us-east-1")
-            print(
-                f"EC2_IP1: {EC2_IP1}, EC2_IP2:{EC2_IP2} , SECURITY_GROUP:{SECURITY_GROUP} ")
+        ec2 = boto3.client('ec2', region_name="us-east-1")
+        print(
+            f"EC2_IP1: {EC2_IP1}, EC2_IP2:{EC2_IP2} , SECURITY_GROUP:{SECURITY_GROUP} ")
 
-            response = ec2.run_instances(
-                ImageId="ami-042e8287309f5df03",
-                InstanceType="t2.micro",
-                SecurityGroups=[SECURITY_GROUP],
-                InstanceInitiatedShutdownBehavior='terminate',
-                MinCount=1,
-                MaxCount=1,
-                UserData=f'''#!/bin/bash
-            sudo apt update -y
-            sudo apt install -y python3
-            sudo apt install -y python3-pip
-            sudo apt install -y git
-            echo "export EC2IP1={EC2_IP1}" | sudo tee -a /etc/environment
-            echo "export EC2IP2={EC2_IP2}" | sudo tee -a /etc/environment
-            echo "export WORKER_DELTA={self.worker_delta}" | sudo tee -a /etc/environment
-            source /etc/environment
-            git clone https://github.com/bar-nir/cloud-computing-ex2.git
-            cd cloud-computing-ex2/Worker
-            sudo chmod 777 app.py
-            sudo chmod 777 terminate_ec2.sh
-            sudo pip3 install -r requirements.txt
-            sudo python3 app.py
-            ''',
-            )
-            print("EC2 created:", response)
-            instance_id = response['Instances'][0]['InstanceId']
-            print(f'Launching instance {instance_id}...')
-            waiter = ec2.get_waiter('instance_status_ok')
-            waiter.wait(InstanceIds=[instance_id])
-            print(f'Instance {instance_id} is running.')
-            self.worksers += 1
-        except Exception as e:
-            print(f"Error: {e}")
+        response = ec2.run_instances(
+            ImageId="ami-042e8287309f5df03",
+            InstanceType="t2.micro",
+            SecurityGroups=[SECURITY_GROUP],
+            InstanceInitiatedShutdownBehavior='terminate',
+            MinCount=1,
+            MaxCount=1,
+            UserData=f'''#!/bin/bash
+        sudo apt update -y
+        sudo apt install -y python3
+        sudo apt install -y python3-pip
+        sudo apt install -y git
+        echo "export EC2IP1={EC2_IP1}" | sudo tee -a /etc/environment
+        echo "export EC2IP2={EC2_IP2}" | sudo tee -a /etc/environment
+        echo "export WORKER_DELTA={self.worker_delta}" | sudo tee -a /etc/environment
+        source /etc/environment
+        git clone https://github.com/bar-nir/cloud-computing-ex2.git
+        cd cloud-computing-ex2/Worker
+        sudo chmod 777 app.py
+        sudo chmod 777 terminate_ec2.sh
+        sudo pip3 install -r requirements.txt
+        sudo python3 app.py
+        ''',
+        )
+        print("EC2 created:", response)
+        instance_id = response['Instances'][0]['InstanceId']
+        print(f'Launching instance {instance_id}...')
 
     def set_time_deltas(self, time_delta):
         try:
@@ -138,3 +136,7 @@ class JobService():
             self.worker_delta = int(time_delta['worker_delta'])
         except Exception as e:
             print(f"Error: {e}")
+
+    def deploy_in_progress_to_false(self):
+        self.deploy_in_progress = False
+        return

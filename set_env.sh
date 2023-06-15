@@ -4,7 +4,7 @@ OTHER_IP="$2"
 KEY_PATH="$3"
 INSTANCE_USER="ubuntu"
 
-ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i "$KEY_PATH" "$INSTANCE_USER"@"$INSTANCE_IP" << EOF
+ssh -o StrictHostKeyChecking=no -o "ConnectionAttempts=60" -i "$KEY_PATH" "$INSTANCE_USER"@"$INSTANCE_IP" << EOF
   echo "export OTHER_IP=$OTHER_IP" | sudo tee -a /etc/environment
   echo "export MY_IP=$INSTANCE_IP" | sudo tee -a /etc/environment
   source /etc/environment
