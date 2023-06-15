@@ -48,7 +48,7 @@ class JobService():
     def scale_workers(self):
         while True:
             time.sleep(self.scale_worker_time_delta)
-            if not self.incompleted_jobs.empty() and self.deploy_in_progress == False:
+            if (not self.incompleted_jobs.empty()) and (self.deploy_in_progress == False):
                 current_job = self.incompleted_jobs.queue[0]
                 if self.max_workers > self.worksers \
                         and datetime.now() - datetime.fromisoformat(current_job["date"]) > timedelta(seconds=self.scale_worker_time_delta):

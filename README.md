@@ -168,3 +168,15 @@ curl --location --request PUT '3.235.135.117:5000/manager/add' \
 ```
 curl --location --request POST '3.235.135.117:5000/pullCompleted?top=10&from=manager'
 ```
+
+## Worker notify the manager that he is running
+
+- **URL:** `EC2_IP:5000/worker-has-started`
+- **Method:** `POST`
+- **Description:**
+  The manager does not deploy new workers until he gets notified by the worker that he is running
+- **example**:
+
+```
+curl --location --request POST '3.235.135.117:5000/worker-has-started'
+```
