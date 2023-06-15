@@ -32,11 +32,13 @@ class JobService():
             f'http://{self.other_manager_ip}:5000/length', timeout=5).json()
 
         if (self.incompleted_jobs.qsize() - self.treshhold_to_pass_message > other_manager_queue_length):
+            try:
+                requests.put(f'http://{self.other_manager_ip}:5000/manager/add',
+                             json=current_job, timeout=5)
+            except Exception as e:
+                print(f"error: {e}")
+                self.incompleted_jobs.put(current_job)
 
-            self.incompleted_jobs.put(current_job)
-            json_data = json.dumps(current_job)
-            requests.put(f'http://{self.other_manager_ip}:5000/manager/add',
-                         json=json_data, timeout=5)
         else:
             self.incompleted_jobs.put(current_job)
 
