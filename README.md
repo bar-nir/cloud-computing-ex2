@@ -174,7 +174,7 @@ curl --location --request POST '3.235.135.117:5000/pullCompleted?top=10&from=man
 - **URL:** `EC2_IP:5000/worker-has-started`
 - **Method:** `POST`
 - **Description:**
-  The workers are using this route to notify the managers that the deployment of a worker has been completed and the worker is now operational. This notification enables the managers to proceed with deploying additional workers if necessary.
+  The manager does not deploy new workers until he gets notified by the worker that he is running
 - **example**:
 
 ```
