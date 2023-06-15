@@ -11,7 +11,7 @@ Parameters:
     Type: String
     Default: |
       #!/bin/bash
-      sudo apt update -y
+      sudo apt update -y &
 Resources:
   EC2ROLE:
     Type: AWS::IAM::Role
