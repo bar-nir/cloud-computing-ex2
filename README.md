@@ -63,7 +63,7 @@ curl --location --request POST '3.235.135.117:5000/pullCompleted?top=10'
 
   - `scale_delta`: Time in seconds between checking if another EC2 instance needs to be scaled up. It only checks when there is no other EC2 from the same manager in the deployment process.
   - `worker_delta`: Time between each call for a worker to ask for work from an EC2 manager.
-  - defaults set to worker_delta = 5, scale_delata = 3
+  - defaults set to `worker_delta = 5`, `scale_delta = 3`
   - ### `To see different scaling results, please play with these variables.`
 
 - **example**:
